@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="ro">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Descoperă-ți Profilul de Investitor</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+        
+        .quiz-container {
+            max-width: 800px;
+            width: 100%;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 25px 50px rgba(0, 0, 0, 0.15);
+            overflow: hidden;
+        }
+        
+        .quiz-header {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            padding: 40px 30px;
+            text-align: center;
+        }
+        
+        .quiz-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+        }
+        
+        .quiz-subtitle {
+            font-size: 1.2em;
+            opacity: 0.9;
+        }
+        
+        .quiz-content {
+            padding: 40px 30px;
+        }
+        
+        .question-container {
+            display: none;
+            animation: slideIn 0.5s ease;
+        }
+        
+        .question-container.active {
+            display: block;
+        }
+        
+        @keyframes slideIn {
+            from { opacity: 0; transform: translateX(30px); }
+            to { opacity: 1; transform: translateX(0); }
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e5e7eb;
+            border-radius: 4px;
+            margin-bottom: 30px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: linear-gradient(135deg, #10b981, #059669);
+            border-radius: 4px;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .question-number {
+            font-size: 1.1em;
+            color: #6b7280;
+            margin-bottom: 10px;
+        }
+        
+        .question-text {
+            font-size: 1.4em;
+            font-weight: 600;
+            color: #1f2937;
+            margin-bottom: 25px;
+            line-height: 1.4;
+        }
+        
+        .answers-container {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .answer-option {
+            background: #f9fafb;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            padding: 20px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .answer-option:hover {
+            border-color: #667eea;
+            background: #f0f4ff;
+            transform: translateY(-2px);
+        }
+        
+        .answer-option.selected {
+            border-color: #667eea;
+            background: linear-gradient(135deg, #667eea20, #764ba220);
+        }
+        
+        .answer-text {
+            font-size: 1.1em;
+            font-weight: 500;
+            color: #374151;
+        }
+        
+        .answer-description {
+            font-size: 0.95em;
+            color: #6b7280;
+            margin-top: 8px;
+        }
+        
+        .navigation-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 40px;
+            gap: 20px;
+        }
+        
+        .btn {
+            padding: 15px 30px;
+            border: none;
+            border-radius: 10px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            flex: 1;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(102, 126, 234, 0.3);
+        }
+        
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #374151;
+            border: 2px solid #d1d5db;
+        }
+        
+        .btn-secondary:hover {
+            background: #e5e7eb;
+        }
+        
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        
+        .result-container {
+            display: none;
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .result-container.active {
+            display: block;
+        }
+        
+        .result-icon {
+            font-size: 4em;
+            margin-bottom: 20px;
+        }
+        
+        .result-title {
+            font-size: 2.5em;
+            font-weight: bold;
+            margin-bottom: 15px;
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            background-clip: text;
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+        
+        .result-subtitle {
+            font-size: 1.3em;
+            color: #6b7280;
+            margin-bottom: 30px;
+        }
+        
+        .result-description {
+            background: #f8fafc;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: left;
+            margin-bottom: 30px;
+        }
+        
+        .result-allocation {
+            font-size: 1.4em;
+            font-weight: bold;
+            color: #1f2937;
+            margin-bottom: 20px;
+        }
+        
+        .result-traits {
+            list-style: none;
+            padding: 0;
+        }
+        
+        .result-traits li {
+            padding: 8px 0;
+            color: #4b5563;
+            position: relative;
+            padding-left: 25px;
+        }
+        
+        .result-traits li::before {
+            content: "✓";
+            position: absolute;
+            left: 0;
+            color: #10b981;
+            font-weight: bold;
+        }
+        
+        .restart-btn {
+            margin-top: 30px;
+        }
+        
+        @media (max-width: 640px) {
+            .quiz-header {
+                padding: 30px 20px;
+            }
+            
+            .quiz-title {
+                font-size: 2em;
+            }
+            
+            .quiz-content {
+                padding: 30px 20px;
+            }
+            
+            .navigation-buttons {
+                flex-direction: column;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="quiz-container">
+        <div class="quiz-header">
+            <div class="quiz-title">🎯 Descoperă-ți Profilul de Investitor</div>
+            <div class="quiz-subtitle">Răspunde la 8 întrebări pentru a-ți identifica strategia ideală de investiții</div>
+        </div>
+        
+        <div class="quiz-content">
+            <div class="progress-bar">
+                <div class="progress-fill"></div>
+            </div>
+            
+            <!-- Question 1 -->
+            <div class="question-container active">
+                <div class="question-number">Întrebarea 1 din 8</div>
+                <div class="question-text">Care este vârsta ta?</div>
+                <div class="answers-container">
+                    <div class="answer-option" data-score="4">
+                        <div class="answer-text">Sub 30 de ani</div>
+                        <div class="answer-description">Ai timp să-ți recuperezi eventualele pierderi</div>
+                    </div>
+                    <div class="answer-option" data-score="3">
+                        <div class="answer-text">30-45 de ani</div>
+                        <div class="answer-description">Încă ai un orizont de timp lung pentru investiții</div>
+                    </div>
+                    <div class="answer-option" data-score="2">
+                        <div class="answer-text">45-60 de ani</div>
+                        <div class="answer-description">Aproape de pensie, dar încă poți accepta unele riscuri</div>
+                    </div>
+                    <div class="answer-option" data-score="1">
+                        <div class="answer-text">Peste 60 de ani</div>
+                        <div class="answer-description">Prioritatea este păstrarea capitalului</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 2 -->
+            <div class="question-container">
+                <div class="question-number">Întrebarea 2 din 8</div>
+                <div class="question-text">Care este experiența ta cu investițiile?</div>
+                <div class="answers-container">
+                    <div class="answer-option" data-score="1">
+                        <div class="answer-text">Începător complet</div>
+                        <div class="answer-description">Nu am investit niciodată în acțiuni sau fonduri</div>
+                    </div>
+                    <div class="answer-option" data-score="2">
+                        <div class="answer-text">Experiență limitată</div>
+                        <div class="answer-description">Am investit puțin, mai mult în produse sigure</div>
+                    </div>
+                    <div class="answer-option" data-score="3">
+                        <div class="answer-text">Experiență moderată</div>
+                        <div class="answer-description">Am investit în acțiuni și fonduri de câțiva ani</div>
+                    </div>
+                    <div class="answer-option" data-score="4">
+                        <div class="answer-text">Foarte experimentat</div>
+                        <div class="answer-description">Investesc activ de mulți ani în diverse instrumente</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 3 -->
+            <div class="question-container">
+                <div class="question-number">Întrebarea 3 din 8</div>
+                <div class="question-text">Dacă investiția ta pierde 20% într-o lună, ce faci?</div>
+                <div class="answers-container">
+                    <div class="answer-option" data-score="1">
+                        <div class="answer-text">Vând imediat din panică</div>
+                        <div class="answer-description">Nu pot accepta pierderi mari</div>
+                    </div>
+                    <div class="answer-option" data-score="2">
+                        <div class="answer-text">Mă gândesc la asta des</div>
+                        <div class="answer-description">Consider să vând o parte</div>
+                    </div>
+                    <div class="answer-option" data-score="3">
+                        <div class="answer-text">Sunt îngrijorat dar aștept</div>
+                        <div class="answer-description">Înțeleg că sunt fluctuații normale</div>
+                    </div>
+                    <div class="answer-option" data-score="4">
+                        <div class="answer-text">Văd o oportunitate de cumpărare</div>
+                        <div class="answer-description">Investesc mai mult la prețuri reduse</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 4 -->
+            <div class="question-container">
+                <div class="question-number">Întrebarea 4 din 8</div>
+                <div class="question-text">Care este orizontul tău de timp pentru investiții?</div>
+                <div class="answers-container">
+                    <div class="answer-option" data-score="1">
+                        <div class="answer-text">Sub 2 ani</div>
+                        <div class="answer-description">Am nevoie de bani în curând</div>
+                    </div>
+                    <div class="answer-option" data-score="2">
+                        <div class="answer-text">2-5 ani</div>
+                        <div class="answer-description">Orizont mediu de timp</div>
+                    </div>
+                    <div class="answer-option" data-score="3">
+                        <div class="answer-text">5-15 ani</div>
+                        <div class="answer-description">Pot aștepta pentru rezultate mai bune</div>
+                    </div>
+                    <div class="answer-option" data-score="4">
+                        <div class="answer-text">Peste 15 ani</div>
+                        <div class="answer-description">Investesc pentru pensia mea</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 5 -->
+            <div class="question-container">
+                <div class="question-number">Întrebarea 5 din 8</div>
+                <div class="question-text">Ce procent din venituri poți investi lunar?</div>
+                <div class="answers-container">
+                    <div class="answer-option" data-score="1">
+                        <div class="answer-text">Sub 5%</div>
+                        <div class="answer-description">Am bugete foarte strânse</div>
+                    </div>
+                    <div class="answer-option" data-score="2">
+                        <div class="answer-text">5-10%</div>
+                        <div class="answer-description">Pot investi o sumă modestă</div>
+                    </div>
+                    <div class="answer-option" data-score="3">
+                        <div class="answer-text">10-20%</div>
+                        <div class="answer-description">Am un buget decent pentru investiții</div>
+                    </div>
+                    <div class="answer-option" data-score="4">
+                        <div class="answer-text">Peste 20%</div>
+                        <div class="answer-description">Pot investi sume mari în mod regulat</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 6 -->
+            <div class="question-container">
+                <div class="question-number">Întrebarea 6 din 8</div>
+                <div class="question-text">Ce randament anual îți dorești?</div>
+                <div class="answers-container">
+                    <div class="answer-option" data-score="1">
+                        <div class="answer-text">3-5% (sigur)</div>
+                        <div class="answer-description">Prefer siguranța la randamente mici</div>
+                    </div>
+                    <div class="answer-option" data-score="2">
+                        <div class="answer-text">5-8% (moderat)</div>
+                        <div class="answer-description">Echilibru între risc și randament</div>
+                    </div>
+                    <div class="answer-option" data-score="3">
+                        <div class="answer-text">8-12% (dinamic)</div>
+                        <div class="answer-description">Accept riscuri pentru randamente mai mari</div>
+                    </div>
+                    <div class="answer-option" data-score="4">
+                        <div class="answer-text">Peste 12% (agresiv)</div>
+                        <div class="answer-description">Vreau să maximizez câștigurile</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 7 -->
+            <div class="question-container">
+                <div class="question-number">Întrebarea 7 din 8</div>
+                <div class="question-text">Cum reacționezi la știrile negative din piață?</div>
+                <div class="answers-container">
+                    <div class="answer-option" data-score="1">
+                        <div class="answer-text">Mă panichează complet</div>
+                        <div class="answer-description">Nu pot dormi noaptea din cauza stresului</div>
+                    </div>
+                    <div class="answer-option" data-score="2">
+                        <div class="answer-text">Mă îngrijorez mult</div>
+                        <div class="answer-description">Verific constant portofoliul</div>
+                    </div>
+                    <div class="answer-option" data-score="3">
+                        <div class="answer-text">Simt un sentiment de îngrijorare</div>
+                        <div class="answer-description">Înțeleg că sunt cicluri normale</div>
+                    </div>
+                    <div class="answer-option" data-score="4">
+                        <div class="answer-text">Rămân complet calm</div>
+                        <div class="answer-description">Văd oportunități în criză</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Question 8 -->
+            <div class="question-container">
+                <div class="question-number">Întrebarea 8 din 8</div>
+                <div class="question-text">Ce este mai important pentru tine?</div>
+                <div class="answers-container">
+                    <div class="answer-option" data-score="1">
+                        <div class="answer-text">Să nu pierd bani</div>
+                        <div class="answer-description">Păstrarea capitalului e prioritatea #1</div>
+                    </div>
+                    <div class="answer-option" data-score="2">
+                        <div class="answer-text">Câștiguri mici dar constante</div>
+                        <div class="answer-description">Prefer predictibilitatea</div>
+                    </div>
+                    <div class="answer-option" data-score="3">
+                        <div class="answer-text">Echilibru între risc și câștig</div>
+                        <div class="answer-description">Vreau să cresc banii moderat</div>
+                    </div>
+                    <div class="answer-option" data-score="4">
+                        <div class="answer-text">Să maximizez câștigurile</div>
+                        <div class="answer-description">Accept riscuri mari pentru randamente mari</div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Results -->
+            <div class="result-container">
+                <div class="result-content"></div>
+                <button class="btn btn-primary restart-btn" onclick="restartQuiz()">
+                    🔄 Refă Testul
+                </button>
+            </div>
+            
+            <div class="navigation-buttons">
+                <button class="btn btn-secondary" id="prevBtn" onclick="previousQuestion()" style="display: none;">
+                    ← Înapoi
+                </button>
+                <button class="btn btn-primary" id="nextBtn" onclick="nextQuestion()" disabled>
+                    Continuă →
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        let currentQuestion = 0;
+        let totalScore = 0;
+        let answers = [];
+        const totalQuestions = 8;
+        
+        const profiles = {
+            precaut: {
+                icon: "🛡️",
+                title: "Investitor Precaut",
+                subtitle: "20% acțiuni / 80% obligațiuni",
+                description: "Te simți confortabil cu investiții mai sigure și ești dispus să accepți doar variații minore ale valorii investiției tale.",
+                traits: [
+                    "Prioritizezi păstrarea capitalului",
+                    "Preferi predictibilitatea la câștiguri mari",
+                    "Te stresezi ușor la fluctuații de preț",
+                    "Ai un orizont de timp scurt-mediu",
+                    "Randament țintă: 4-6% anual"
+                ]
+            },
+            moderat: {
+                icon: "⚖️",
+                title: "Investitor Moderat",
+                subtitle: "50% acțiuni / 50% obligațiuni",
+                description: "Accepți variații moderate ale valorii portofoliului și echilibru între siguranță și randament.",
+                traits: [
+                    "Cauți un echilibru optim risc-randament",
+                    "Poți accepta fluctuații moderate",
+                    "Ai experiență cu investițiile",
+                    "Orizont de timp mediu-lung",
+                    "Randament țintă: 6-8% anual"
+                ]
+            },
+            dinamic: {
+                icon: "📈",
+                title: "Investitor Dinamic",
+                subtitle: "75% acțiuni / 25% obligațiuni",
+                description: "Ești dispus să accepți fluctuații semnificative ale investiției tale știind că pe termen lung piața tinde să crească.",
+                traits: [
+                    "Accepți volatilitatea pentru randamente mai mari",
+                    "Ai experiență cu piețele de capital",
+                    "Gândești pe termen lung",
+                    "Poți dormi liniștit în perioade de declin",
+                    "Randament țintă: 8-12% anual"
+                ]
+            },
+            agresiv: {
+                icon: "🚀",
+                title: "Investitor Agresiv",
+                subtitle: "100% acțiuni",
+                description: "Cauți oportunități de creștere maximă pentru investiția ta, ești conștient că investițiile ta vor întâmpina fluctuații majore și ești un investitor pe termen lung.",
+                traits: [
+                    "Vrei să maximizezi potențialul de creștere",
+                    "Accepți riscuri mari pentru randamente mari",
+                    "Ai nervi tari și experiență vastă",
+                    "Orizont de investiții foarte lung",
+                    "Randament țintă: 12%+ anual"
+                ]
+            }
+        };
+        
+        function updateProgress() {
+            const progress = (currentQuestion / totalQuestions) * 100;
+            document.querySelector('.progress-fill').style.width = progress + '%';
+        }
+        
+        function selectAnswer(element, score) {
+            // Remove previous selection
+            document.querySelectorAll('.answer-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            // Add selection to clicked option
+            element.classList.add('selected');
+            
+            // Store answer
+            answers[currentQuestion] = score;
+            
+            // Enable next button
+            document.getElementById('nextBtn').disabled = false;
+        }
+        
+        function nextQuestion() {
+            if (currentQuestion < totalQuestions - 1) {
+                document.querySelectorAll('.question-container')[currentQuestion].classList.remove('active');
+                currentQuestion++;
+                document.querySelectorAll('.question-container')[currentQuestion].classList.add('active');
+                
+                updateProgress();
+                updateButtons();
+                
+                // Check if answer already selected
+                if (answers[currentQuestion] !== undefined) {
+                    document.getElementById('nextBtn').disabled = false;
+                    // Reselect the previously selected option
+                    const selectedScore = answers[currentQuestion];
+                    document.querySelectorAll('.answer-option').forEach(opt => {
+                        if (parseInt(opt.dataset.score) === selectedScore) {
+                            opt.classList.add('selected');
+                        }
+                    });
+                } else {
+                    document.getElementById('nextBtn').disabled = true;
+                }
+            } else {
+                showResults();
+            }
+        }
+        
+        function previousQuestion() {
+            if (currentQuestion > 0) {
+                document.querySelectorAll('.question-container')[currentQuestion].classList.remove('active');
+                currentQuestion--;
+                document.querySelectorAll('.question-container')[currentQuestion].classList.add('active');
+                
+                updateProgress();
+                updateButtons();
+                
+                // Reselect the previously selected option
+                const selectedScore = answers[currentQuestion];
+                document.querySelectorAll('.answer-option').forEach(opt => {
+                    opt.classList.remove('selected');
+                    if (parseInt(opt.dataset.score) === selectedScore) {
+                        opt.classList.add('selected');
+                    }
+                });
+                
+                document.getElementById('nextBtn').disabled = false;
+            }
+        }
+        
+        function updateButtons() {
+            const prevBtn = document.getElementById('prevBtn');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            if (currentQuestion === 0) {
+                prevBtn.style.display = 'none';
+            } else {
+                prevBtn.style.display = 'block';
+            }
+            
+            if (currentQuestion === totalQuestions - 1) {
+                nextBtn.textContent = 'Vezi Rezultatul 🎯';
+            } else {
+                nextBtn.textContent = 'Continuă →';
+            }
+        }
+        
+        function calculateProfile() {
+            totalScore = answers.reduce((sum, score) => sum + score, 0);
+            const averageScore = totalScore / totalQuestions;
+            
+            if (averageScore <= 1.5) {
+                return 'precaut';
+            } else if (averageScore <= 2.5) {
+                return 'moderat';
+            } else if (averageScore <= 3.5) {
+                return 'dinamic';
+            } else {
+                return 'agresiv';
+            }
+        }
+        
+        function showResults() {
+            document.querySelectorAll('.question-container')[currentQuestion].classList.remove('active');
+            document.querySelector('.navigation-buttons').style.display = 'none';
+            
+            const profileType = calculateProfile();
+            const profile = profiles[profileType];
+            
+            const resultContent = document.querySelector('.result-content');
+            resultContent.innerHTML = `
+                <div class="result-icon">${profile.icon}</div>
+                <div class="result-title">${profile.title}</div>
+                <div class="result-subtitle">${profile.subtitle}</div>
+                <div class="result-description">
+                    <div class="result-allocation">${profile.subtitle}</div>
+                    <p style="margin-bottom: 20px; line-height: 1.6; color: #4b5563;">${profile.description}</p>
+                    <ul class="result-traits">
+                        ${profile.traits.map(trait => `<li>${trait}</li>`).join('')}
+                    </ul>
+                </div>
+            `;
+            
+            document.querySelector('.result-container').classList.add('active');
+            updateProgress();
+        }
+        
+        function restartQuiz() {
+            currentQuestion = 0;
+            totalScore = 0;
+            answers = [];
+            
+            document.querySelector('.result-container').classList.remove('active');
+            document.querySelector('.navigation-buttons').style.display = 'flex';
+            document.querySelectorAll('.question-container')[0].classList.add('active');
+            
+            document.querySelectorAll('.answer-option').forEach(opt => {
+                opt.classList.remove('selected');
+            });
+            
+            document.getElementById('nextBtn').disabled = true;
+            document.getElementById('nextBtn').textContent = 'Continuă →';
+            document.getElementById('prevBtn').style.display = 'none';
+            
+            updateProgress();
+        }
+        
+        // Add event listeners to answer options
+        document.querySelectorAll('.answer-option').forEach(option => {
+            option.addEventListener('click', function() {
+                const score = parseInt(this.dataset.score);
+                selectAnswer(this, score);
+            });
+        });
+        
+        // Initialize
+        updateProgress();
+        updateButtons();
+    </script>
+</body>
+</html>
